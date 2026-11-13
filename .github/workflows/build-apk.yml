@@ -15,6 +15,7 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -24,12 +25,23 @@ jobs:
           mkdir -p /tmp/build-fix
           cp viral-factory-android/app/build.gradle /tmp/build-fix/build.gradle
 
-      - name: Unpack Android project
+      - name: Extract Android project
         run: unzip -oq viral-factory-android-project.zip
 
       - name: Apply JVM target fix
         run: |
           cp /tmp/build-fix/build.gradle viral-factory-android/app/build.gradle
+
+      - name: Package extracted source
+        run: |
+          zip -qr viral-factory-android-source.zip viral-factory-android \
+            -x '*/build/*' '*/.gradle/*'
+
+      - name: Upload extracted source
+        uses: actions/upload-artifact@v4
+        with:
+          name: viral-factory-android-source
+          path: viral-factory-android-source.zip
 
       - name: Set up Java
         uses: actions/setup-java@v4
