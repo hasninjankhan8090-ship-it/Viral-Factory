@@ -6,6 +6,7 @@ on:
   push:
     paths:
       - 'viral-factory-android-project.zip'
+      - 'viral-factory-android/app/build.gradle'
       - '.github/workflows/build-apk.yml'
 
 permissions:
@@ -18,8 +19,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Save corrected Gradle file
+        run: |
+          mkdir -p /tmp/build-fix
+          cp viral-factory-android/app/build.gradle /tmp/build-fix/build.gradle
+
       - name: Unpack Android project
-        run: unzip -q viral-factory-android-project.zip
+        run: unzip -oq viral-factory-android-project.zip
+
+      - name: Apply JVM target fix
+        run: |
+          cp /tmp/build-fix/build.gradle viral-factory-android/app/build.gradle
 
       - name: Set up Java
         uses: actions/setup-java@v4
@@ -42,4 +52,3 @@ jobs:
           name: viral-factory-debug-apk
           path: viral-factory-android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
-          
